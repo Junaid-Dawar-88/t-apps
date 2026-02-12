@@ -16,7 +16,7 @@ model Teacher {
   id         Int      @id @default(autoincrement())
   name       String
   email      String   @unique
-  phone      String?
+  phone      String
   subject    String?
   created_at DateTime @default(now())
 
@@ -37,8 +37,8 @@ model Syllabus {
   topics      String 
   description String?
   type        String
-  start_date  DateTime?
-  end_date    DateTime?
+  start_date  DateTime
+  end_date    DateTime
   created_at  DateTime  @default(now())
 
   teacher Teacher @relation(fields: [teacher_id], references: [id], onDelete: Cascade)
@@ -72,11 +72,11 @@ model Student {
 model Exam {
   id             Int       @id @default(autoincrement())
   exam_name      String
-  exam_date      DateTime?
-  total_marks    Int?
+  exam_date      DateTime
+  total_marks    Int
   obtained_marks Int
-  teacher_id     Int?
-  student_id     Int?
+  teacher_id     Int
+  student_id     Int
   created_at     DateTime @default(now())
 
   teacher Teacher? @relation(fields: [teacher_id], references: [id], onDelete: Cascade)

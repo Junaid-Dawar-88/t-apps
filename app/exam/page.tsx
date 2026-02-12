@@ -40,14 +40,17 @@ export default async function ExamUI() {
               <tbody>
                 {exams.length > 0 ? (
                   exams.map((exam) => {
-                    const percentage = ((exam.obtained_marks / exam.total_marks) * 100).toFixed(2);
+                    const percentage =
+                           exam.total_marks && exam.obtained_marks
+                                 ? ((exam.obtained_marks / exam.total_marks) * 100).toFixed(2)
+                                            : "0.00";
                     return (
                       <tr key={exam.id} className="border-b hover:bg-gray-50">
                         <td className="p-3">{exam.exam_name}</td>
-                        <td className="p-3">{exam.teacher.name}</td>
-                        <td className="p-3">{exam.student.name}</td>
-                        <td className="p-3">{exam.obtained_marks}</td>
-                        <td className="p-3">{exam.total_marks}</td>
+                        <td className="p-3">{exam.teacher?.name ?? "No Teacher"}</td>
+                        <td className="p-3">{exam.student?.name ?? "No Student"}</td>
+                       <td className="p-3">{exam.obtained_marks}</td>
+                       <td className="p-3">{exam.total_marks}</td>
                         <td className="p-3">
                           <span
                             className={`px-2 py-1 rounded-full text-sm ${
@@ -61,7 +64,15 @@ export default async function ExamUI() {
                         </td>
                         <td className="p-3">
                       <div className="flex items-center gap-2">
-                     <UpdateExamModal exam={exam} />
+                          <UpdateExamModal 
+  id={exam.id}
+  name={exam.exam_name}
+  date={exam.exam_date}
+  total_marks={exam.total_marks}
+  obtained_marks={exam.obtained_marks}
+  teacherId={exam.teacher?.id ?? ""}
+  studentId={exam.student?.id ?? ""}
+/>
                     <ExamDelete examId={exam.id} />
                         </div>
                       </td>
