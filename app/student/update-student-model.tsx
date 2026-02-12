@@ -5,22 +5,25 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { updateStudent } from "../actions/student-actions"
 
-
-interface UpdateStudentModalProps {
-  student: {
-    id: number
-    name: string
-    father: string
-    roll_number: string
-    class: string
-    phone: string
-    address: string
-  }
-  onUpdate?: (student: any) => void 
+export interface Student {
+  id: number
+  name: string
+  father: string
+  roll_number: string
+  class: string
+  phone: string
+  address: string | null
 }
 
-export default function UpdateStudentModal({ student, onUpdate }: UpdateStudentModalProps) {
+interface UpdateStudentModalProps {
+  student: Student
+  onUpdate?: (student: Student) => void
+}
 
+export default function UpdateStudentModal({
+  student,
+  onUpdate,
+}: UpdateStudentModalProps) {
   const [isOpen, setIsOpen] = React.useState(false)
 
   return (
@@ -39,12 +42,36 @@ export default function UpdateStudentModal({ student, onUpdate }: UpdateStudentM
               if (onUpdate) onUpdate(updatedStudent)
             }}
           >
-            <Input name="name" defaultValue={student.name} placeholder="Student Name" />
-            <Input name="father" defaultValue={student.father} placeholder="Father Name" />
-            <Input name="roll_number" defaultValue={student.roll_number} placeholder="Roll Number" />
-            <Input name="class" defaultValue={student.class} placeholder="Class" />
-            <Input name="phone" defaultValue={student.phone} placeholder="Phone" />
-            <Input name="address" defaultValue={student.address} placeholder="Address" />
+            <Input
+              name="name"
+              defaultValue={student.name}
+              placeholder="Student Name"
+            />
+            <Input
+              name="father"
+              defaultValue={student.father}
+              placeholder="Father Name"
+            />
+            <Input
+              name="roll_number"
+              defaultValue={student.roll_number}
+              placeholder="Roll Number"
+            />
+            <Input
+              name="class"
+              defaultValue={student.class}
+              placeholder="Class"
+            />
+            <Input
+              name="phone"
+              defaultValue={student.phone}
+              placeholder="Phone"
+            />
+            <Input
+              name="address"
+              defaultValue={student.address || ""}
+              placeholder="Address"
+            />
 
             <div className="flex justify-end gap-2">
               <Button type="button" onClick={() => setIsOpen(false)} variant="outline">

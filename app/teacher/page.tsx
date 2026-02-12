@@ -13,20 +13,21 @@ interface teacherData {
   id: number
   name: string
   email: string
-  phone: number
+  phone: string
 }
 
 export default function TeacherCards() {
   const [teachers, setTeachers] = useState<teacherData[]>([])
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    async function fetchTeachers() {
-      const data = await getTeacher()
-      setTeachers(data)
-    }
-    fetchTeachers()
-  }, [])
+useEffect(() => {
+  async function fetchTeachers() {
+    const data = await getTeacher()
+    const formatted = data.map((t: any) => ({ ...t, phone: Number(t.phone) }))
+    setTeachers(formatted)
+  }
+  fetchTeachers()
+}, [])
 
   const filteredTeachers = teachers.filter(
     (teacher) =>
