@@ -1,65 +1,143 @@
-import Image from "next/image";
+import React from 'react'
+import { getStudent } from './actions/student-actions'
+import { getTeacher } from './actions/teacher-actions'
 
-export default function Home() {
+const Home = async () => {
+  const students = await getStudent()
+  const teachers = await getTeacher()
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className='min-h-screen bg-slate-100 p-8'>
+
+      <div className='bg-gradient-to-r from-blue-700 to-indigo-700 text-white rounded-3xl p-10 shadow-xl mb-10'>
+        <h1 className='text-4xl font-bold mb-2'>
+          Welcome to Dawaloom
+        </h1>
+        <p className='text-blue-100 text-lg'>
+          Smart Teacher & Student Management System
+        </p>
+      </div>
+
+      <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12'>
+
+        <div className='bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition'>
+          <p className='text-slate-500 font-medium'>طلاب (Students)</p>
+          <h2 className='text-4xl font-bold text-blue-600 mt-2'>
+            {students.length}
+          </h2>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className='bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition'>
+          <p className='text-slate-500 font-medium'>Teachers</p>
+          <h2 className='text-4xl font-bold text-indigo-600 mt-2'>
+            {teachers.length}
+          </h2>
         </div>
-      </main>
+
+        <div className='bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition'>
+          <p className='text-slate-500 font-medium'>Active Classes</p>
+          <h2 className='text-4xl font-bold text-green-600 mt-2'>
+            8
+          </h2>
+        </div>
+
+        <div className='bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition'>
+          <p className='text-slate-500 font-medium'>Attendance Today</p>
+          <h2 className='text-4xl font-bold text-orange-500 mt-2'>
+            145
+          </h2>
+        </div>
+
+      </div>
+      <div className='grid lg:grid-cols-3 gap-8'>
+
+        <div className='lg:col-span-2'>
+          <h2 className='text-2xl font-bold text-slate-800 mb-6'>
+            Top Teachers
+          </h2>
+
+          <div className='grid md:grid-cols-2 gap-6'>
+
+            {teachers.slice(0,4).map((teacher) => (
+              <div
+                key={teacher.id}
+                className='bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition group cursor-pointer'
+              >
+
+                <div className='flex items-center gap-4 mb-4'>
+                  
+                  <div className='w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center text-white text-xl font-bold'>
+                    {teacher.name?.charAt(0)}
+                  </div>
+
+                  <div>
+                    <h3 className='font-bold text-lg text-slate-800'>
+                      {teacher.name}
+                    </h3>
+                    <p className='text-slate-500 text-sm'>
+                      Teacher_Id: {teacher.id}
+                    </p>
+                  </div>
+
+                </div>
+
+                <div className='flex justify-between text-sm text-slate-500'>
+                  <span>{teacher.email}</span>
+                </div>
+
+                <div className='mt-4'>
+                  <span className='bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold'>
+                    Active
+                  </span>
+                </div>
+
+              </div>
+            ))}
+
+          </div>
+        </div>
+        <div className='bg-white rounded-2xl p-6 shadow-md h-fit'>
+          <h2 className='text-xl font-bold mb-4 text-slate-800'>
+            Recent Activity
+          </h2>
+
+          <div className='space-y-4'>
+
+            <div className='flex gap-3'>
+              <div className='w-2 bg-green-500 rounded-full'></div>
+              <p className='text-slate-600 text-sm'>
+                New teacher added
+              </p>
+            </div>
+
+            <div className='flex gap-3'>
+              <div className='w-2 bg-blue-500 rounded-full'></div>
+              <p className='text-slate-600 text-sm'>
+                Student attendance updated
+              </p>
+            </div>
+
+            <div className='flex gap-3'>
+              <div className='w-2 bg-purple-500 rounded-full'></div>
+              <p className='text-slate-600 text-sm'>
+                New class scheduled
+              </p>
+            </div>
+
+            <div className='flex gap-3'>
+              <div className='w-2 bg-orange-400 rounded-full'></div>
+              <p className='text-slate-600 text-sm'>
+                Teacher profile updated
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
     </div>
-  );
+  )
 }
+
+export default Home

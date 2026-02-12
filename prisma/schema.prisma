@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/**
+ * =========================
+ * Teachers
+ * =========================
+ */
+model Teacher {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  phone      String?
+  subject    String?
+  created_at DateTime @default(now())
+
+  syllabus  Syllabus[]
+  exams     Exam[]
+  schedules Schedule[]
+}
+
+/**
+ * =========================
+ * Syllabus
+ * =========================
+ */
+model Syllabus {
+  id          Int       @id @default(autoincrement())
+  teacher_id  Int
+  title       String
+  topics      String 
+  description String?
+  type        String
+  start_date  DateTime?
+  end_date    DateTime?
+  created_at  DateTime  @default(now())
+
+  teacher Teacher @relation(fields: [teacher_id], references: [id], onDelete: Cascade)
+}
+
+/**
+ * =========================
+ * Students
+ * =========================
+ */
+model Student {
+  id         Int       @id @default(autoincrement())
+  name       String
+  father     String
+  roll_number String
+  class      String
+  phone      String
+  address    String?
+  created_at DateTime @default(now())
+
+  attendance Attendance[]
+  schedules  Schedule[] 
+  exam       Exam[]
+}
+
+/**
+ * =========================
+ * Exams
+ * =========================
+ */
+model Exam {
+  id             Int       @id @default(autoincrement())
+  exam_name      String
+  exam_date      DateTime?
+  total_marks    Int?
+  obtained_marks Int
+  teacher_id     Int?
+  student_id     Int?
+  created_at     DateTime @default(now())
+
+  teacher Teacher? @relation(fields: [teacher_id], references: [id], onDelete: Cascade)
+  student Student? @relation(fields: [student_id], references: [id], onDelete: Cascade)
+}
+
+/**
+ * =========================
+ * Attendance
+ * =========================
+ */
+model Attendance {
+  id              Int      @id @default(autoincrement())
+  student_id      Int
+  attendance_date DateTime
+  status          String
+  remarks         String?
+  created_at      DateTime @default(now())
+
+  student Student @relation(fields: [student_id], references: [id])
+
+  @@unique([student_id, attendance_date])
+}
+
+/**
+ * =========================
+ * Schedules
+ * =========================
+ */
+model Schedule {
+  id         Int      @id @default(autoincrement())
+  teacher_id Int
+  subject    String
+  timing     String
+  created_at DateTime @default(now())
+
+  teacher  Teacher   @relation(fields: [teacher_id], references: [id])
+  students Student[] 
+}
