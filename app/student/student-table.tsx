@@ -12,7 +12,7 @@ import {
 import { User, Phone, Home, GraduationCap } from "lucide-react";
 import StudentModal from "./student-model";
 import { getStudent } from "../actions/student-actions";
-import { getClasses } from "../actions/class-action"; // <-- import your class fetcher
+import { getClasses } from "../actions/class-action";
 import DeleteStudentButton from "./delete-student";
 import UpdateStudentModal from "./update-student-model";
 
@@ -21,13 +21,15 @@ interface Student {
   name: string;
   father: string;
   roll_number: string;
-  phone?: string | '';
-  address: string | '';
-  class: {
+  phone: string | null;
+  address: string | null;
+  class_id: number;
+  class?: {
     id: number;
     name: string;
   };
 }
+
 
 interface Class {
   id: number;
@@ -44,7 +46,8 @@ export default function StudentTableUI({ selectedClass }: Props) {
   
   useEffect(() => {
     async function getData() {
-      const data = await getStudent(selectedClass.id);
+      if(!selectedClass) return 
+      const data: any = await getStudent(selectedClass.id);
       setStudents(data);
     }
     getData();
@@ -131,10 +134,10 @@ export default function StudentTableUI({ selectedClass }: Props) {
                 onDelete={() => handleDelete(student.id)}
               />
               <UpdateStudentModal
-               student={student ?? null}
-               classes={allClasses}
-               onUpdate={handleUpdate}
-               />
+                student={student ?? null}
+                classes={allClasses}
+                onUpdate={handleUpdate}
+              />
             </CardFooter>
           </Card>
         ))}

@@ -14,29 +14,50 @@ interface Student {
   id: number;
   name: string;
   father: string;
-  rollNumber: string;
+  roll_number: string;
 }
 
 export default function AttendancePage() {
   const [classes, setClasses] = useState<Class[]>([]);
   const [search, setSearch] = useState("");
-  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
-  const [students, setStudents] = useState<Student[]>([]);
 
+  // ⭐ Keep null here (this is correct for selection UI)
+  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
+
+  const [students, setStudents] = useState<Student[]>([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+
+  // ✅ Fetch classes ONCE
   useEffect(() => {
     async function fetchClasses() {
-      const data = await getClasses();
-      setClasses(data);
+      try {
+        const data = await getClasses();
+        setClasses(data);
+      } catch (error) {
+        console.error("Failed to load classes", error);
+      }
     }
+
     fetchClasses();
   }, []);
 
+  // ✅ Fetch students ONLY when class is selected
   useEffect(() => {
+    // ⭐ THIS LINE removes your TypeScript error
     if (!selectedClass) return;
 
     async function fetchStudents() {
-      const data = await getStudent(selectedClass.id);
-      setStudents(data);
+      try {
+        setLoadingStudents(true);
+            if(!selectedClass) return
+        const data = await getStudent(selectedClass.id);
+        setStudents(data);
+
+      } catch (error) {
+        console.error("Failed to load students", error);
+      } finally {
+        setLoadingStudents(false);
+      }
     }
 
     fetchStudents();
@@ -69,7 +90,7 @@ export default function AttendancePage() {
           {filteredClasses.map((cls) => (
             <li
               key={cls.id}
-              className="border-b last:border-b-0 cursor-pointer p-4 hover:bg-gray-800"
+              className="border-b last:border-b-0 cursor-pointer p-4 hover:bg-gray-800 transition"
               onClick={() => setSelectedClass(cls)}
             >
               {cls.id}. {cls.name}
@@ -82,7 +103,7 @@ export default function AttendancePage() {
         <ClassAttendanceModal
           classId={selectedClass.id}
           className={selectedClass.name}
-          students={students}
+          students={students} 
           onClose={() => setSelectedClass(null)}
         />
       )}

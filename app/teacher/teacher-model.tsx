@@ -1,93 +1,57 @@
 'use client'
 
 import React, { useState } from 'react'
-import { addTeacher } from '@/app/actions/teacher-actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { addTeacher } from '../actions/teacher-actions'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from '@/components/ui/dialog'
+interface Teacher {
+  id: number
+  name: string
+  email: string
+  phone: string
+  subject: string | null
+  created_at: Date
+}
 
 export default function TeacherModalToggle() {
   const [isOpen, setIsOpen] = useState(false)
-  const [teacher , setTeachers] = useState([])
+  const [teachers, setTeachers] = useState<Teacher[]>([])
 
   async function handleTeacher(formData: FormData) {
-    const teachers = await addTeacher(formData)
-    setTeachers(teachers)
+    const newTeacher = await addTeacher(formData)
+    setTeachers([...teachers, newTeacher]) 
     setIsOpen(false)
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <>
+      <Button onClick={() => setIsOpen(true)}>Add Teacher</Button>
 
-      <DialogTrigger asChild>
-        <Button className="bg-blue-700 hover:bg-blue-500 text-white rounded-full px-8 py-3 hover:scale-105 transition-transform duration-300">
-          Add Teacher
-        </Button>
-      </DialogTrigger>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <form
+            className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full space-y-4"
+            action={async (formData: FormData) => {
+              await handleTeacher(formData)
+            }}
+          >
+            <Input name="name" placeholder="Teacher Name" />
+            <Input name="email" placeholder="Email" />
+            <Input name="phone" placeholder="Phone" />
+            <Input name="subject" placeholder="Subject" />
 
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Add Teacher</DialogTitle>
-        </DialogHeader>
-
-        <form
-          className="space-y-4"
-          action={handleTeacher}
-        >
-          <div className="space-y-2">
-            <Label>Full Name</Label>
-            <Input
-              name="name"
-              type="text"
-              placeholder="John Doe"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Email Address</Label>
-            <Input
-              name="email"
-              type="email"
-              placeholder="john@example.com"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Phone Number</Label>
-            <Input
-              name="phone"
-              type="tel"
-              placeholder="+1 (555) 000-0000"
-              required
-            />
-          </div>
-
-          <DialogFooter className="gap-2">
-            <DialogClose asChild>
-              <Button variant="outline">
-                Cancel Teacher
+            <div className="flex justify-end gap-2">
+              <Button type="button" onClick={() => setIsOpen(false)} variant="outline">
+                Cancel
               </Button>
-            </DialogClose>
-            <Button type="submit" className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
-              Add Teacher
-            </Button>
-          </DialogFooter>
-
-        </form>
-      </DialogContent>
-
-    </Dialog>
+              <Button type="submit" className="bg-blue-500 text-white">
+                Add
+              </Button>
+            </div>
+          </form>
+        </div>
+      )}
+    </>
   )
 }

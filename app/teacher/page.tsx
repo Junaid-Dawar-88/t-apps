@@ -12,7 +12,7 @@ interface teacherData {
   id: number
   name: string
   email: string
-  phone?: string | ''
+  phone: string
 }
 
 export default function TeacherTable() {
@@ -26,7 +26,7 @@ export default function TeacherTable() {
 
       const formatted = data.map((t) => ({
         ...t,
-        phone: String(t.phone),
+        phone: t.phone ? String(t.phone) : '', // ensure phone is always a string
       }))
 
       setTeachers(formatted)
@@ -146,10 +146,7 @@ export default function TeacherTable() {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan={4}
-                  className="text-center py-10 text-slate-400"
-                >
+                <td colSpan={4} className="text-center py-10 text-slate-400">
                   No teachers found
                 </td>
               </tr>

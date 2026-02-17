@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
+import React, {  useState, useTransition } from "react";
 import Script from "next/script";
-import { markAttendance, getClassAttendance, deleteAttendance } from "../actions/attendance-action";
+import {
+  markAttendance,
+  getClassAttendance,
+  deleteAttendance,
+} from "../actions/attendance-action";
 
 interface Student {
   id: number;
@@ -35,14 +39,20 @@ export default function ClassAttendanceModal({
 }: Props) {
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [isPending, startTransition] = useTransition();
-  const [selectedRecord, setSelectedRecord] = useState<AttendanceRecord | null>(null);
+
+  // ✅ FIXED — now correctly typed
+  const [selectedRecord, setSelectedRecord] =
+    useState<AttendanceRecord | null>(null);
+
   const [jsPDFLoaded, setJsPDFLoaded] = useState(false);
 
+  //-------------------------------------------
   // Load attendance
+  //-------------------------------------------
   const loadAttendance = async () => {
     const data = await getClassAttendance(classId);
 
-    const mapped = (data as any[]).map((rec) => ({
+    const mapped = (data).map((rec) => ({
       id: rec.id,
       status: rec.status as Status,
       student: {
@@ -57,15 +67,20 @@ export default function ClassAttendanceModal({
     setRecords(mapped);
   };
 
-  useEffect(() => {
-    loadAttendance();
-  }, [classId]);
 
+  //-------------------------------------------
   // Mark attendance
+  //-------------------------------------------
   const handleMark = (student: Student, status: Status) => {
     setRecords((prev) => {
       const exist = prev.find((r) => r.student.id === student.id);
-      if (exist) return prev.map((r) => r.student.id === student.id ? { ...r, status } : r);
+
+      if (exist) {
+        return prev.map((r) =>
+          r.student.id === student.id ? { ...r, status } : r
+        );
+      }
+
       return [
         ...prev,
         {
@@ -89,7 +104,9 @@ export default function ClassAttendanceModal({
     });
   };
 
+  //-------------------------------------------
   // Delete attendance
+  //-------------------------------------------
   const handleDelete = (id: number) => {
     setRecords((prev) => prev.filter((r) => r.id !== id));
 
@@ -99,15 +116,18 @@ export default function ClassAttendanceModal({
     });
   };
 
-  // Generate Monthly PDF safely
+  //-------------------------------------------
+  // Generate Monthly PDF
+  //-------------------------------------------
   const generateMonthlyReport = (student: Student) => {
     if (!jsPDFLoaded) {
-      alert("PDF library is not loaded yet. Please wait a moment and try again.");
+      alert("PDF library is still loading...");
       return;
     }
 
-    const globalAny = window as any;
-    const doc = new globalAny.jspdf.jsPDF();
+    // safer access
+    const { jsPDF } = (window as any).jspdf;
+    const doc = new jsPDF();
 
     doc.setFontSize(18);
     doc.text(`${student.name}'s Monthly Attendance Report`, 20, 20);
@@ -117,19 +137,19 @@ export default function ClassAttendanceModal({
     doc.text("Status", 80, 40);
 
     const today = new Date();
-    const month = today.getMonth();
-    const year = today.getFullYear();
 
-    const studentRecords = records.filter(
-      (r) =>
+    const studentRecords = records.filter((r) => {
+      const d = new Date(r.date);
+
+      return (
         r.student.id === student.id &&
-        new Date(r.date).getMonth() === month &&
-        new Date(r.date).getFullYear() === year
-    );
+        d.getMonth() === today.getMonth() &&
+        d.getFullYear() === today.getFullYear()
+      );
+    });
 
-
-  
     let y = 50;
+
     studentRecords.forEach((rec) => {
       doc.text(rec.date, 20, y);
       doc.text(rec.status, 80, y);
@@ -141,7 +161,7 @@ export default function ClassAttendanceModal({
 
   return (
     <>
-      {/* Load jsPDF globally */}
+      {/* Load jsPDF */}
       <Script
         src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
         strategy="afterInteractive"
@@ -150,7 +170,6 @@ export default function ClassAttendanceModal({
 
       <div className="fixed inset-0 bg-black/40 flex justify-center pt-20 z-50">
         <div className="bg-slate-800 text-white w-full max-w-6xl rounded-xl p-6 shadow-2xl relative">
-          {/* Close Button */}
           <button
             onClick={onClose}
             className="absolute right-4 top-4 text-xl hover:text-red-400"
@@ -175,7 +194,9 @@ export default function ClassAttendanceModal({
 
             <tbody>
               {students.map((student) => {
-                const existing = records.find((r) => r.student.id === student.id);
+                const existing = records.find(
+                  (r) => r.student.id === student.id
+                );
 
                 return (
                   <tr key={student.id}>
@@ -200,21 +221,12 @@ export default function ClassAttendanceModal({
             </tbody>
           </table>
 
-          {/* Today's Records */}
+          {/* Records */}
           {records.length > 0 && (
             <div className="mt-10">
-              <h3 className="text-xl font-bold mb-3">Today Records</h3>
+              <h3 className="text-xl font-bold mb-3">Attendance Records</h3>
 
               <table className="w-full border">
-                <thead className="bg-slate-700">
-                  <tr>
-                    <th className="border p-2">Student</th>
-                    <th className="border p-2">Status</th>
-                    <th className="border p-2">Date</th>
-                    <th className="border p-2">Action</th>
-                  </tr>
-                </thead>
-
                 <tbody>
                   {records.map((rec) => (
                     <tr
@@ -223,13 +235,7 @@ export default function ClassAttendanceModal({
                       onClick={() => setSelectedRecord(rec)}
                     >
                       <td className="border p-2">{rec.student.name}</td>
-                      <td className={`border p-2 font-bold ${
-                        rec.status === "Present"
-                          ? "text-green-400"
-                          : rec.status === "Absent"
-                          ? "text-red-400"
-                          : "text-yellow-300"
-                      }`}>{rec.status}</td>
+                      <td className="border p-2">{rec.status}</td>
                       <td className="border p-2">{rec.date}</td>
                       <td className="border p-2">
                         <button
@@ -237,7 +243,7 @@ export default function ClassAttendanceModal({
                             e.stopPropagation();
                             handleDelete(rec.id);
                           }}
-                          className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+                          className="bg-red-500 px-3 py-1 rounded"
                         >
                           Delete
                         </button>
@@ -249,7 +255,7 @@ export default function ClassAttendanceModal({
             </div>
           )}
 
-          {/* Attendance Detail Modal */}
+          {/* Detail Modal */}
           {selectedRecord && (
             <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
               <div className="bg-slate-900 text-white rounded-xl p-6 w-[400px]">
@@ -257,24 +263,17 @@ export default function ClassAttendanceModal({
 
                 <p><strong>Student:</strong> {selectedRecord.student.name}</p>
                 <p><strong>Father:</strong> {selectedRecord.student.father}</p>
-                <p><strong>Roll Number:</strong> {selectedRecord.student.roll_number}</p>
-                <p>
-                  <strong>Status:</strong>{" "}
-                  <span className={`font-bold ${
-                    selectedRecord.status === "Present"
-                      ? "text-green-400"
-                      : selectedRecord.status === "Absent"
-                      ? "text-red-400"
-                      : "text-yellow-300"
-                  }`}>{selectedRecord.status}</span>
-                </p>
+                <p><strong>Roll:</strong> {selectedRecord.student.roll_number}</p>
+                <p><strong>Status:</strong> {selectedRecord.status}</p>
                 <p><strong>Date:</strong> {selectedRecord.date}</p>
 
                 <button
-                  onClick={() => generateMonthlyReport(selectedRecord.student)}
-                  className="mt-2 w-full bg-blue-500 py-2 rounded-lg hover:bg-blue-600"
+                  onClick={() =>
+                    generateMonthlyReport(selectedRecord.student)
+                  }
+                  className="mt-2 w-full bg-blue-500 py-2 rounded-lg"
                 >
-                  Download Monthly Report (PDF)
+                  Download Monthly Report
                 </button>
 
                 <button

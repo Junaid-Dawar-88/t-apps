@@ -4,14 +4,15 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import { updateStudent } from "../actions/student-actions";
 
-export interface Student {
+interface Student {
   id: number;
   name: string;
   father: string;
   roll_number: string;
-  phone?: string | '';
+  phone: string | null;
   address: string | null;
-  class: {
+  class_id: number;
+  class?: {
     id: number;
     name: string;
   };
@@ -23,7 +24,7 @@ interface Class {
 }
 
 interface UpdateStudentModalProps {
-  student: Student;
+  student: Student | null;
   classes: Class[];
   onUpdate?: (student: Student) => void;
 }
@@ -50,20 +51,28 @@ export default function UpdateStudentModal({
         ReactDOM.createPortal(
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-            onClick={() => setIsOpen(false)} 
+            onClick={() => setIsOpen(false)}
           >
             <div
               className="bg-white rounded-xl p-6 shadow-xl max-w-lg w-[90%] mx-auto"
-              onClick={(e) => e.stopPropagation()} // prevent closing if clicked inside
+              onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-xl font-bold text-center mb-4">Update Student</h2>
+              <h2 className="text-xl font-bold text-center mb-4">
+                Update Student
+              </h2>
 
               <form
                 className="space-y-3"
                 action={async (formData: FormData) => {
-                  const updatedStudent = await updateStudent(student.id, formData);
+                  const updatedStudent = await updateStudent(
+                    student.id,
+                    formData
+                  );
                   setIsOpen(false);
-                  if (onUpdate && updatedStudent) onUpdate(updatedStudent);
+
+                  if (onUpdate && updatedStudent) {
+                    onUpdate(updatedStudent);
+                  }
                 }}
               >
                 <input
@@ -72,31 +81,46 @@ export default function UpdateStudentModal({
                   placeholder="Student Name"
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
+
                 <input
                   name="father"
                   defaultValue={student.father}
                   placeholder="Father Name"
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
+
                 <input
                   name="roll_number"
                   defaultValue={student.roll_number}
                   placeholder="Roll Number"
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
-                
+
                 <input
                   name="phone"
-                  defaultValue={student.phone}
+                  defaultValue={student.phone ?? ""}
                   placeholder="Phone"
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
+
                 <input
                   name="address"
                   defaultValue={student.address ?? ""}
                   placeholder="Address"
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
+
+                <select
+                  name="class_id"
+                  defaultValue={student.class_id}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  {classes.map((cls) => (
+                    <option key={cls.id} value={cls.id}>
+                      {cls.name}
+                    </option>
+                  ))}
+                </select>
 
                 <div className="flex justify-end gap-2 mt-2">
                   <button
@@ -106,6 +130,7 @@ export default function UpdateStudentModal({
                   >
                     Cancel
                   </button>
+
                   <button
                     type="submit"
                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"

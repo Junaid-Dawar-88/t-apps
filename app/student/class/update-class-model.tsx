@@ -22,8 +22,8 @@ export default function UpdateClassModal({ classId, currentName, onClose, onUpda
       const updated = await updateClass(classId, name);
       onUpdate(updated.name);
       onClose();
-    } catch (err: any) {
-      alert(err.message || "Failed to update class");
+    } catch (error) {
+      throw error
     } finally {
       setLoading(false);
     }

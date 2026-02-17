@@ -8,11 +8,18 @@ interface TeacherCardProps {
     id: number
     name: string
     email: string
-    phone?: string | ''
+    phone?: string | '' | undefined
   }
   onClose: () => void
 }
+
 const TeacherCard: React.FC<TeacherCardProps> = ({ teacher, onClose }) => {
+  // Ensure phone is always a string
+  const safeTeacher = {
+    ...teacher,
+    phone: teacher.phone ? String(teacher.phone) : '', // <-- fix here
+  }
+
   return (
     <div
       onClick={onClose}
@@ -41,12 +48,12 @@ const TeacherCard: React.FC<TeacherCardProps> = ({ teacher, onClose }) => {
           </div>
           <div className="flex items-center gap-4">
             <Phone className="w-6 h-6 text-indigo-500" />
-            <span className="text-gray-800 font-medium">{teacher.phone}</span>
+            <span className="text-gray-800 font-medium">{safeTeacher.phone}</span>
           </div>
         </div>
 
         <div className="flex justify-center gap-4 p-6 bg-gray-50 border-t border-gray-200">
-          <UpdateTeacherModal teacher={teacher} />
+          <UpdateTeacherModal teacher={safeTeacher} />
           <DeleteTeacherButton teacherId={teacher.id} />
         </div>
       </div>
