@@ -24,8 +24,6 @@ export default function TeacherModalToggle() {
     setTeachers([...teachers, newTeacher])
     setIsOpen(false)
   }
-
-  // Modal component using portal
   const Modal = ({ children }: { children: React.ReactNode }) => {
     if (typeof window === 'undefined') return null
     return createPortal(
@@ -64,7 +62,7 @@ export default function TeacherModalToggle() {
             <div className="space-y-3">
               <Input name="name" placeholder="Teacher Name" required />
               <Input name="email" placeholder="Email" type="email" required />
-              <Input name="phone" placeholder="Phone" type="tel" required />
+              <Input name="phone" placeholder="Phone" type="text" required />
               <Input name="subject" placeholder="Subject" />
             </div>
 
