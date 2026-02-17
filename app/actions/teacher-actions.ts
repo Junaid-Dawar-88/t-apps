@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-// Create Teacher
+
 export async function addTeacher(formData: FormData) {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
@@ -15,11 +15,10 @@ export async function addTeacher(formData: FormData) {
     data: { name, email, phone },
   });
 
-  revalidatePath("/teacher"); // optional: refresh teacher list
+  revalidatePath("/teacher");
   return teacher;
 }
 
-// Get all Teachers
 export async function getTeacher() {
   const teachers = await prisma.teacher.findMany({
     orderBy: { id: "desc" },

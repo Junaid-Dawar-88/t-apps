@@ -24,7 +24,7 @@ export async function addStudent(formData: FormData) {
       name,
       father,
       roll_number,
-      phone,
+      phone: phone || "",
       address,
       class: { connect: { id: classId } },
     },
@@ -72,7 +72,7 @@ export async function updateStudent(studentId: number, formData: FormData) {
       name,
       father,
       roll_number,
-      phone,
+     phone: phone || "",
       address,
     },
   });

@@ -21,7 +21,7 @@ interface Student {
   name: string;
   father: string;
   roll_number: string;
-  phone: string;
+  phone?: string;
   address: string | '';
   class: {
     id: number;
@@ -40,9 +40,8 @@ interface Props {
 
 export default function StudentTableUI({ selectedClass }: Props) {
   const [students, setStudents] = useState<Student[]>([]);
-  const [allClasses, setAllClasses] = useState<Class[]>([]); // store all classes for dropdown
+  const [allClasses, setAllClasses] = useState<Class[]>([]); 
 
-  // Fetch students and classes
   useEffect(() => {
     async function getData() {
       const data = await getStudent(selectedClass.id);
