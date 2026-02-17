@@ -29,6 +29,7 @@ export async function getTeacher() {
     name: t.name,
     email: t.email,
     phone: t.phone ?? "",
+    createdAt: t.created_at,
   }));
 }
 
