@@ -71,7 +71,7 @@ export async function updateStudent(studentId: number, formData: FormData) {
     data: {
       name,
       father,
-      roll_number,
+      roll_number: roll_number || '',
      phone: phone || "",
       address,
     },
