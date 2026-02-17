@@ -10,7 +10,7 @@ interface Teacher {
   id: number
   name: string
   email: string
-  phone: string | ''
+  phone: string 
   subject: string | null
   created_at: Date
 }
