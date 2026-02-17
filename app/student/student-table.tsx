@@ -42,19 +42,23 @@ export default function StudentTableUI({ selectedClass }: Props) {
   const [students, setStudents] = useState<Student[]>([]);
   const [allClasses, setAllClasses] = useState<Class[]>([]); 
 
-  useEffect(() => {
-    async function getData() {
-      const data = await getStudent(selectedClass.id);
-      setStudents(data);
-    }
-    getData();
+useEffect(() => {
+  if (!selectedClass) return; 
 
-    async function fetchClasses() {
-      const classesData = await getClasses();
-      setAllClasses(classesData);
-    }
-    fetchClasses();
-  }, [selectedClass.id]);
+  async function fetchStudents() {
+    const data = await getStudent(selectedClass.id);
+    setStudents(data);
+  }
+
+  async function fetchClasses() {
+    const classesData = await getClasses();
+    setAllClasses(classesData);
+  }
+
+  fetchStudents();
+  fetchClasses();
+}, [selectedClass]); 
+
 
   const handleDelete = (id: number) => {
     setStudents((prev) => prev.filter((s) => s.id !== id));
