@@ -57,8 +57,10 @@ export default function TeacherTable() {
               Manage your teachers efficiently
             </p>
           </div>
-
+                
+                <div >
           <TeacherModalToggle />
+                </div>
         </div>
       </div>
 

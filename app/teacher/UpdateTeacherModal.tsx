@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { createPortal } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { updateTeacher } from '../actions/teacher-actions'
@@ -13,6 +14,17 @@ interface UpdateTeacherModalProps {
 export default function UpdateTeacherModal({ teacher }: UpdateTeacherModalProps) {
   const [isOpen, setIsOpen] = React.useState(false)
 
+  // Modal wrapper using portal
+  const Modal = ({ children }: { children: React.ReactNode }) => {
+    if (typeof window === 'undefined') return null
+    return createPortal(
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        {children}
+      </div>,
+      document.body
+    )
+  }
+
   return (
     <>
       <Button
@@ -24,17 +36,27 @@ export default function UpdateTeacherModal({ teacher }: UpdateTeacherModalProps)
       </Button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <Modal>
           <form
-            className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full space-y-4"
+            className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full space-y-4 relative"
             action={async (formData: FormData) => {
               await updateTeacher(teacher.id, formData)
               setIsOpen(false)
             }}
           >
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+            >
+              ✕
+            </button>
+
             <Input name="name" defaultValue={teacher.name} />
             <Input name="email" defaultValue={teacher.email} />
             <Input name="phone" defaultValue={teacher.phone} />
+
             <div className="flex justify-end gap-2">
               <Button type="button" onClick={() => setIsOpen(false)} variant="outline">
                 Cancel
@@ -44,7 +66,7 @@ export default function UpdateTeacherModal({ teacher }: UpdateTeacherModalProps)
               </Button>
             </div>
           </form>
-        </div>
+        </Modal>
       )}
     </>
   )
