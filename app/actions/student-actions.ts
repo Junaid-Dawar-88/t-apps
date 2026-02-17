@@ -24,8 +24,8 @@ export async function addStudent(formData: FormData) {
       name,
       father,
       roll_number,
-      phone: phone || "",
-      address,
+      phone: phone ?? "",
+      address: address ?? '',
       class: { connect: { id: classId } },
     },
   });

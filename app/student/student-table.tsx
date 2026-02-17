@@ -21,8 +21,8 @@ interface Student {
   name: string;
   father: string;
   roll_number: string;
-  phone: string | null;
-  address: string | null;
+  phone?: string | null;
+  address?: string | null;
   class_id: number;
   class?: {
     id: number;
