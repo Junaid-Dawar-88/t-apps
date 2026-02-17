@@ -8,7 +8,7 @@ import { updateTeacher } from '../actions/teacher-actions'
 import { Pencil } from 'lucide-react'
 
 interface UpdateTeacherModalProps {
-  teacher: { id: number; name: string; email: string; phone: string }
+  teacher: { id: number; name: string; email: string; phone: string | '' }
 }
 
 export default function UpdateTeacherModal({ teacher }: UpdateTeacherModalProps) {
