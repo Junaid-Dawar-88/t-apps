@@ -1,89 +1,123 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { updateStudent } from "../actions/student-actions"
+import * as React from "react";
+import ReactDOM from "react-dom";
+import { updateStudent } from "../actions/student-actions";
 
 export interface Student {
-  id: number
-  name: string
-  father: string
-  roll_number: string
-  class: string
-  phone: string
-  address: string | null
+  id: number;
+  name: string;
+  father: string;
+  roll_number: string;
+  phone: string;
+  address: string | null;
+  class: {
+    id: number;
+    name: string;
+  };
+}
+
+interface Class {
+  id: number;
+  name: string;
 }
 
 interface UpdateStudentModalProps {
-  student: Student
-  onUpdate?: (student: Student) => void
+  student: Student;
+  classes: Class[];
+  onUpdate?: (student: Student) => void;
 }
 
 export default function UpdateStudentModal({
   student,
+  classes,
   onUpdate,
 }: UpdateStudentModalProps) {
-  const [isOpen, setIsOpen] = React.useState(false)
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  if (!student) return null;
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)} size="sm" variant="outline">
+      <button
+        onClick={() => setIsOpen(true)}
+        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+      >
         Update
-      </Button>
+      </button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <form
-            className="bg-white rounded-xl p-6 shadow-xl max-w-md w-full space-y-4"
-            action={async (formData: FormData) => {
-              const updatedStudent = await updateStudent(student.id, formData)
-              setIsOpen(false)
-              if (onUpdate) onUpdate(updatedStudent)
-            }}
+      {isOpen &&
+        ReactDOM.createPortal(
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            onClick={() => setIsOpen(false)} 
           >
-            <Input
-              name="name"
-              defaultValue={student.name}
-              placeholder="Student Name"
-            />
-            <Input
-              name="father"
-              defaultValue={student.father}
-              placeholder="Father Name"
-            />
-            <Input
-              name="roll_number"
-              defaultValue={student.roll_number}
-              placeholder="Roll Number"
-            />
-            <Input
-              name="class"
-              defaultValue={student.class}
-              placeholder="Class"
-            />
-            <Input
-              name="phone"
-              defaultValue={student.phone}
-              placeholder="Phone"
-            />
-            <Input
-              name="address"
-              defaultValue={student.address || ""}
-              placeholder="Address"
-            />
+            <div
+              className="bg-white rounded-xl p-6 shadow-xl max-w-lg w-[90%] mx-auto"
+              onClick={(e) => e.stopPropagation()} // prevent closing if clicked inside
+            >
+              <h2 className="text-xl font-bold text-center mb-4">Update Student</h2>
 
-            <div className="flex justify-end gap-2">
-              <Button type="button" onClick={() => setIsOpen(false)} variant="outline">
-                Cancel
-              </Button>
-              <Button type="submit" className="bg-blue-500 text-white">
-                Update
-              </Button>
+              <form
+                className="space-y-3"
+                action={async (formData: FormData) => {
+                  const updatedStudent = await updateStudent(student.id, formData);
+                  setIsOpen(false);
+                  if (onUpdate && updatedStudent) onUpdate(updatedStudent);
+                }}
+              >
+                <input
+                  name="name"
+                  defaultValue={student.name}
+                  placeholder="Student Name"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <input
+                  name="father"
+                  defaultValue={student.father}
+                  placeholder="Father Name"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <input
+                  name="roll_number"
+                  defaultValue={student.roll_number}
+                  placeholder="Roll Number"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                
+                <input
+                  name="phone"
+                  defaultValue={student.phone}
+                  placeholder="Phone"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+                <input
+                  name="address"
+                  defaultValue={student.address ?? ""}
+                  placeholder="Address"
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+
+                <div className="flex justify-end gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsOpen(false)}
+                    className="border px-4 py-2 rounded hover:bg-gray-100 transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                  >
+                    Update
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
-  )
+  );
 }

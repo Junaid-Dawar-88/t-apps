@@ -4,6 +4,7 @@ import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { updateTeacher } from '../actions/teacher-actions'
+import { Pencil } from 'lucide-react'
 
 interface UpdateTeacherModalProps {
   teacher: { id: number; name: string; email: string; phone: string }
@@ -14,9 +15,13 @@ export default function UpdateTeacherModal({ teacher }: UpdateTeacherModalProps)
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)} size="sm" variant="outline">
-        Update
-      </Button>
+      <Button
+  onClick={() => setIsOpen(true)}
+  size="sm"
+  className="bg-blue-600 text-white hover:bg-blue-700 border-0"
+>
+  <Pencil className="w-4 h-4" />
+</Button>
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">

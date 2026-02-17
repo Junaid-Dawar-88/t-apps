@@ -3,45 +3,87 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function managAttendance(formData: FormData) {
+/* =====================================
+   MARK / UPDATE ATTENDANCE
+===================================== */
+export async function markAttendance(formData: FormData) {
+  const studentId = Number(formData.get("studentId"));
+  const classId = Number(formData.get("classId"));
+  const status = formData.get("status") as "Present" | "Absent" | "Leave";
+  const date = new Date(formData.get("date") as string);
 
-  const student_id = Number(formData.get("studentId"));
-  const attendance_date = new Date(formData.get("date") as string);
-  const status = formData.get("status") as string;
-  const remarks = formData.get("remarks") as string | null;
-
-  if (!student_id || !attendance_date || !status) {
-    throw new Error("Missing required fields");
+  if (!studentId || !classId || !status) {
+    throw new Error("Missing fields");
   }
 
-  try {
+  date.setHours(0, 0, 0, 0);
 
-    await prisma.attendance.create({
-      data: {
-        student_id,
-        attendance_date,
-        status,
-        remarks: remarks || null,
-      },
-    });
-    revalidatePath("/attendance"); 
+  // ✅ Use snake_case as in Prisma schema
+  const student = await prisma.student.findUnique({
+    where: { id: studentId },
+    select: { class_id: true },
+  });
 
-  } catch (error) {
-    throw error;
+  if (!student) throw new Error("Student not found");
+
+  // ✅ Validate class
+  if (student.class_id !== classId) {
+    throw new Error("Invalid class");
   }
+
+  // ✅ Upsert attendance
+  await prisma.attendance.upsert({
+  where: {
+    student_id_attendance_date: {
+      student_id: studentId,
+      attendance_date: date,
+    },
+  },
+  update: {
+    status,
+  },
+  create: {
+    student_id: studentId,
+    attendance_date: date,
+    status,
+  },
+});
+
+  revalidatePath("/attendance");
 }
 
-export async function getAttendance() {
-  return await prisma.attendance.findMany({
+/* =====================================
+   GET ATTENDANCE BY CLASS
+===================================== */
+export async function getClassAttendance(
+  classId: number,
+  date?: Date
+) {
+  const target = date ?? new Date();
+  target.setHours(0, 0, 0, 0);
+
+  const next = new Date(target);
+  next.setDate(target.getDate() + 1);
+
+  return prisma.attendance.findMany({
+    where: {
+      attendance_date: {
+        gte: target,
+        lt: next,
+      },
+      student: {
+        class_id: classId, // ✅ Use snake_case
+      },
+    },
     include: {
       student: true,
-    },
-    orderBy: {
-      attendance_date: "desc",
     },
   });
 }
 
+/* =====================================
+   DELETE ATTENDANCE
+===================================== */
 export async function deleteAttendance(id: number) {
   await prisma.attendance.delete({
     where: { id },

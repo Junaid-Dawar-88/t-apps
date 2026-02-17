@@ -1,11 +1,10 @@
 'use client'
-import * as React from 'react'
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import { User, Mail, Phone } from 'lucide-react'
+
+import React, { useState, useEffect } from 'react'
 import TeacherModalToggle from './teacher-model'
 import DeleteTeacherButton from './delete-teacher'
 import UpdateTeacherModal from './UpdateTeacherModal'
+import TeacherCard from './teacher-card'
 import { getTeacher } from '../actions/teacher-actions'
 import SearchTeacher from './search-teacher'
 
@@ -16,18 +15,25 @@ interface teacherData {
   phone: string
 }
 
-export default function TeacherCards() {
+export default function TeacherTable() {
   const [teachers, setTeachers] = useState<teacherData[]>([])
   const [search, setSearch] = useState('')
+  const [selectedTeacher, setSelectedTeacher] = useState<teacherData | null>(null)
 
-useEffect(() => {
-  async function fetchTeachers() {
-    const data = await getTeacher()
-    const formatted = data.map((t: any) => ({ ...t, phone: Number(t.phone) }))
-    setTeachers(formatted)
-  }
-  fetchTeachers()
-}, [])
+  useEffect(() => {
+    async function fetchTeachers() {
+      const data = await getTeacher()
+
+      const formatted = data.map((t) => ({
+        ...t,
+        phone: String(t.phone),
+      }))
+
+      setTeachers(formatted)
+    }
+
+    fetchTeachers()
+  }, [])
 
   const filteredTeachers = teachers.filter(
     (teacher) =>
@@ -36,56 +42,131 @@ useEffect(() => {
   )
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6 flex flex-col items-center gap-6">
- 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full max-w-7xl gap-4">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Teachers: {filteredTeachers.length}
-        </h1>
-        <TeacherModalToggle />
-      </div>
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8">
 
-      <SearchTeacher search={search} setSearch={setSearch} />
+      {/* HEADER */}
+      <div className="max-w-8xl mx-auto mb-8">
+        <div className="backdrop-blur-xl bg-white/5 border border-white/10 shadow-2xl rounded-3xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
-      <div className="w-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTeachers.length > 0 ? (
-          filteredTeachers.map((teacher) => (
-            <Card
-              key={teacher.id}
-              className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow overflow-hidden"
-            >
-       
-              <div className="flex flex-col items-center p-6 border-b border-gray-200">
-                <div className="w-16 h-16 rounded-full bg-blue-200 flex items-center justify-center text-white text-2xl font-bold mb-3">
-                  <User className="w-8 h-8" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">{teacher.name}</h3>
-                <span className="text-gray-500 text-sm mt-1">ID: {teacher.id}</span>
-              </div>
+          <div>
+            <h1 className="text-4xl font-bold text-white tracking-tight">
+              Teacher Dashboard
+            </h1>
 
-              <CardContent className="p-6 space-y-3">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-500" />
-                  <span className="text-gray-700">{teacher.email}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gray-500" />
-                  <span className="text-gray-700">{teacher.phone}</span>
-                </div>
-              </CardContent>
-
-              <CardFooter className="flex justify-center gap-3 p-4 border-t border-gray-200">
-                <UpdateTeacherModal teacher={teacher} />
-                <DeleteTeacherButton teacherId={teacher.id} />
-              </CardFooter>
-            </Card>
-          ))
-        ) : (
-          <div className="col-span-full flex items-center justify-center py-12 bg-gray-50 rounded-xl">
-            <p className="text-gray-500 text-lg">No teachers found</p>
+            <p className="text-slate-300 mt-1">
+              Manage your teachers efficiently
+            </p>
           </div>
-        )}
+
+          <TeacherModalToggle />
+        </div>
       </div>
+
+      {/* SEARCH */}
+      <div className="max-w-7xl mx-auto mb-6">
+        <SearchTeacher search={search} setSearch={setSearch} />
+      </div>
+
+      {/* TABLE */}
+      <div className="max-w-7xl mx-auto overflow-hidden rounded-3xl border border-white/10 shadow-2xl backdrop-blur-xl bg-white/5">
+        <table className="min-w-full text-sm text-left text-slate-300">
+          
+          {/* HEAD */}
+          <thead className="bg-white/10 text-xs uppercase tracking-wider text-slate-200">
+            <tr>
+              <th className="px-6 py-4">Teacher</th>
+              <th className="px-6 py-4">Email</th>
+              <th className="px-6 py-4">Phone</th>
+              <th className="px-6 py-4 text-center">Actions</th>
+            </tr>
+          </thead>
+
+          {/* BODY */}
+          <tbody>
+            {filteredTeachers.length > 0 ? (
+              filteredTeachers.map((teacher) => (
+                <tr
+                  key={teacher.id}
+                  onClick={() => setSelectedTeacher(teacher)}
+                  className="
+                    border-t border-white/5
+                    hover:bg-white/10
+                    transition
+                    cursor-pointer
+                    group
+                  "
+                >
+                  {/* TEACHER */}
+                  <td className="px-6 py-5 flex items-center gap-4">
+
+                    {/* Avatar */}
+                    <div className="
+                      h-12 w-12
+                      rounded-full
+                      bg-gradient-to-tr from-indigo-500 to-purple-600
+                      flex items-center justify-center
+                      font-bold text-white text-lg
+                      shadow-lg
+                      group-hover:scale-110
+                      transition
+                    ">
+                      {teacher.name.charAt(0)}
+                    </div>
+
+                    <div>
+                      <p className="font-semibold text-white">
+                        {teacher.name}
+                      </p>
+
+                      <p className="text-slate-400 text-xs">
+                        ID: {teacher.id}
+                      </p>
+                    </div>
+                  </td>
+
+                  {/* EMAIL */}
+                  <td className="px-6 py-5 text-slate-300">
+                    {teacher.email}
+                  </td>
+
+                  {/* PHONE */}
+                  <td className="px-6 py-5">
+                    {teacher.phone}
+                  </td>
+
+                  {/* ACTIONS */}
+                  <td
+                    className="px-6 py-5 flex justify-center gap-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <UpdateTeacherModal teacher={teacher} />
+                    <DeleteTeacherButton teacherId={teacher.id} />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="text-center py-10 text-slate-400"
+                >
+                  No teachers found
+                </td>
+              </tr>
+            )}
+          </tbody>
+
+        </table>
+      </div>
+
+      {/* CARD MODAL */}
+      {selectedTeacher && (
+        <TeacherCard
+          teacher={selectedTeacher}
+          onClose={() => setSelectedTeacher(null)}
+        />
+      )}
+
     </div>
   )
 }

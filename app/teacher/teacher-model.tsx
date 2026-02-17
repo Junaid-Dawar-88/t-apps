@@ -18,6 +18,13 @@ import {
 
 export default function TeacherModalToggle() {
   const [isOpen, setIsOpen] = useState(false)
+  const [teacher , setTeachers] = useState([])
+
+  async function handleTeacher(formData: FormData) {
+    const teachers = await addTeacher(formData)
+    setTeachers(teachers)
+    setIsOpen(false)
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -35,10 +42,7 @@ export default function TeacherModalToggle() {
 
         <form
           className="space-y-4"
-          action={async (formData: FormData) => {
-            await addTeacher(formData)
-            setIsOpen(false) 
-          }}
+          action={handleTeacher}
         >
           <div className="space-y-2">
             <Label>Full Name</Label>

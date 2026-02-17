@@ -16,8 +16,8 @@ export default function DeleteTeacherButton({ teacherId }: DeleteTeacherButtonPr
   }
 
   return (
-    <Button size="sm" variant="destructive" className="flex-1 p-2" onClick={handleDelete}>
-      <Trash2 className="h-4 w-4 mr-1" /> Delete
+    <Button size="sm" variant="destructive" className="" onClick={handleDelete}>
+      <Trash2 className="h-4 w-4 mr-1" /> 
     </Button>
   )
 }

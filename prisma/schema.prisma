@@ -46,24 +46,39 @@ model Syllabus {
 
 /**
  * =========================
+ * Classes
+ * =========================
+ */
+
+model Class {
+  id         Int       @id @default(autoincrement())
+  name       String    @unique
+  created_at DateTime  @default(now())
+
+  students   Student[] 
+}
+
+/**
+ * =========================
  * Students
  * =========================
  */
 model Student {
-  id         Int       @id @default(autoincrement())
-  name       String
-  father     String
-  roll_number String
-  class      String
-  phone      String
-  address    String?
-  created_at DateTime @default(now())
+  id          Int       @id @default(autoincrement())
+  name        String
+  father      String
+  roll_number String  @unique
+  phone       String  @unique
+  address     String?
+  created_at  DateTime  @default(now())
+
+  class_id    Int
+  class       Class     @relation(fields: [class_id], references: [id] , onDelete: Cascade)
 
   attendance Attendance[]
   schedules  Schedule[] 
-  exam       Exam[]
+  exams      Exam[]
 }
-
 /**
  * =========================
  * Exams
@@ -79,8 +94,8 @@ model Exam {
   student_id     Int
   created_at     DateTime @default(now())
 
-  teacher Teacher? @relation(fields: [teacher_id], references: [id], onDelete: Cascade)
-  student Student? @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  teacher Teacher @relation(fields: [teacher_id], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [student_id], references: [id], onDelete: Cascade)
 }
 
 /**
@@ -96,7 +111,7 @@ model Attendance {
   remarks         String?
   created_at      DateTime @default(now())
 
-  student Student @relation(fields: [student_id], references: [id])
+  student Student @relation(fields: [student_id], references: [id] , onDelete: Cascade)
 
   @@unique([student_id, attendance_date])
 }
@@ -113,6 +128,6 @@ model Schedule {
   timing     String
   created_at DateTime @default(now())
 
-  teacher  Teacher   @relation(fields: [teacher_id], references: [id])
+  teacher  Teacher   @relation(fields: [teacher_id], references: [id] , onDelete: Cascade)
   students Student[] 
 }

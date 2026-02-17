@@ -1,56 +1,60 @@
-'use server'
+"use server";
 
-import prisma from '@/lib/prisma'
-import { revalidatePath } from 'next/cache'
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
+// Create Teacher
 export async function addTeacher(formData: FormData) {
-  const name = formData.get('name') as string
-  const email = formData.get('email') as string
-  const phone = formData.get('phone') as string
+  const name = formData.get("name") as string;
+  const email = formData.get("email") as string;
+  const phone = formData.get("phone") as string;
 
-  if (!name || !email || !phone) throw new Error('All fields are required')
+  if (!name || !email || !phone) throw new Error("All fields are required");
 
-  await prisma.teacher.create({
+  const teacher = await prisma.teacher.create({
     data: { name, email, phone },
-  })
+  });
 
-  revalidatePath('/teacher')
+  revalidatePath("/teacher"); // optional: refresh teacher list
+  return teacher;
 }
 
+// Get all Teachers
 export async function getTeacher() {
   const teachers = await prisma.teacher.findMany({
-    orderBy: { id: 'desc' },
-  })
+    orderBy: { id: "desc" },
+  });
 
-  return teachers.map(t => ({
+  return teachers.map((t) => ({
     id: t.id,
     name: t.name,
     email: t.email,
-    phone: t.phone ?? '',    
-  }))
+    phone: t.phone ?? "",
+    createdAt: t.createdAt,
+  }));
 }
 
-export async function deleteTeacher(teacherId: number) {
-  await prisma.teacher.delete({
-    where: { id: teacherId },
-  })
-
-  revalidatePath('/teacher')
-}
-
+// Update Teacher
 export async function updateTeacher(id: number, formData: FormData) {
-  const name = formData.get('name') as string
-  const email = formData.get('email') as string
-  const phone = formData.get('phone') as string
+  const name = formData.get("name") as string;
+  const email = formData.get("email") as string;
+  const phone = formData.get("phone") as string;
 
-  if (!name || !email || !phone) {
-    throw new Error('All fields are required')
-  }
+  if (!name || !email || !phone) throw new Error("All fields are required");
 
   await prisma.teacher.update({
     where: { id },
     data: { name, email, phone },
-  })
+  });
 
-  revalidatePath('/teacher')
+  revalidatePath("/teacher");
+}
+
+// Delete Teacher
+export async function deleteTeacher(id: number) {
+  await prisma.teacher.delete({
+    where: { id },
+  });
+
+  revalidatePath("/teacher");
 }

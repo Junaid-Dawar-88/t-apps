@@ -17,8 +17,6 @@ export default function DeleteStudentButton({ studentId, onDelete }: Props) {
       if (!conf) return
 
       await deleteStudent(studentId)
-
-      // remove from parent state immediately
       if (onDelete) onDelete()
     })
   }
