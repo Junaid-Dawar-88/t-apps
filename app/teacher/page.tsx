@@ -12,7 +12,7 @@ interface teacherData {
   id: number
   name: string
   email: string
-  phone?: string
+  phone?: string | ''
 }
 
 export default function TeacherTable() {
