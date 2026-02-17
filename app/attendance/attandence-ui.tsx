@@ -127,6 +127,8 @@ export default function ClassAttendanceModal({
         new Date(r.date).getFullYear() === year
     );
 
+
+  
     let y = 50;
     studentRecords.forEach((rec) => {
       doc.text(rec.date, 20, y);
