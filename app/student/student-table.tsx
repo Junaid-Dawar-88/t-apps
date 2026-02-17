@@ -35,30 +35,36 @@ interface Class {
 }
 
 interface Props {
-  selectedClass: Class;
+  selectedClass: Class | null; // <-- allow null
 }
 
 export default function StudentTableUI({ selectedClass }: Props) {
   const [students, setStudents] = useState<Student[]>([]);
   const [allClasses, setAllClasses] = useState<Class[]>([]); 
 
-useEffect(() => {
-  if (!selectedClass) return; 
-
-  async function fetchStudents() {
-    const data = await getStudent(selectedClass.id);
-    setStudents(data);
+  // Early return if selectedClass is null
+  if (!selectedClass) {
+    return (
+      <div className="p-8 text-white">
+        No class selected.
+      </div>
+    );
   }
 
-  async function fetchClasses() {
-    const classesData = await getClasses();
-    setAllClasses(classesData);
-  }
+  useEffect(() => {
+    async function fetchStudents() {
+      const data = await getStudent(selectedClass.id);
+      setStudents(data);
+    }
 
-  fetchStudents();
-  fetchClasses();
-}, [selectedClass]); 
+    async function fetchClasses() {
+      const classesData = await getClasses();
+      setAllClasses(classesData);
+    }
 
+    fetchStudents();
+    fetchClasses();
+  }, [selectedClass]); // use object itself, not .id
 
   const handleDelete = (id: number) => {
     setStudents((prev) => prev.filter((s) => s.id !== id));
@@ -135,10 +141,10 @@ useEffect(() => {
                 onDelete={() => handleDelete(student.id)}
               />
               <UpdateStudentModal
-               student={student ?? null}
-               classes={allClasses}
-               onUpdate={handleUpdate}
-               />
+                student={student ?? null}
+                classes={allClasses}
+                onUpdate={handleUpdate}
+              />
             </CardFooter>
           </Card>
         ))}
